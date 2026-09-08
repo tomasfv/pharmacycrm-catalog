@@ -11,14 +11,14 @@ export default function CategoryPage() {
   const products = getProductsByCategory(id as string);
 
   if (!category) {
-    return <p className="text-gray-500">Categoría no encontrada.</p>;
+    return <p className="text-gray-500 text-lg">Categoría no encontrada.</p>;
   }
 
   return (
     <div>
-      <h2 className="text-xl font-bold text-gray-900 mb-1">{category.name}</h2>
-      <p className="text-gray-500 text-sm mb-4">{products.length} productos disponibles</p>
-      <div className="space-y-3">
+      <h2 className="text-2xl font-bold text-gray-900 mb-1">{category.name}</h2>
+      <p className="text-gray-500 text-base mb-5">{products.length} productos disponibles</p>
+      <div className="space-y-4">
         {products.map((prod) => (
           <ProductCard key={prod.id} product={prod} />
         ))}
