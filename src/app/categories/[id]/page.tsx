@@ -18,7 +18,7 @@ export default function CategoryPage() {
     <div>
       <h2 className="text-xl font-bold text-gray-900 mb-1">{category.name}</h2>
       <p className="text-gray-500 text-sm mb-4">{products.length} productos disponibles</p>
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {products.map((prod) => (
           <ProductCard key={prod.id} product={prod} />
         ))}
