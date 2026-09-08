@@ -39,6 +39,11 @@ function Navbar() {
     <header className="sticky top-0 z-40 bg-white border-b border-gray-200">
       <div className="max-w-2xl mx-auto px-5 h-20 flex items-center justify-between">
         <Link href="/categories" className="flex items-center h-20">
+          <button className="text-gray-700 mr-3">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-7 h-7">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+            </svg>
+          </button>
           <img
             src="/logoFarmacia.jpeg"
             alt="Farmacia"
