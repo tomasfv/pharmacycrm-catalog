@@ -4,6 +4,7 @@ import { useParams } from "next/navigation";
 import { getCategoryById, getProductsByCategory } from "@/data/products";
 import { ProductCard } from "@/components/ProductCard";
 import { CartFooter } from "@/components/CartFooter";
+import { BackButton } from "@/components/BackButton";
 
 export default function CategoryPage() {
   const { id } = useParams();
@@ -16,8 +17,10 @@ export default function CategoryPage() {
 
   return (
     <div>
-      <h2 className="text-2xl font-bold text-gray-900 mb-1">{category.name}</h2>
-      <p className="text-gray-500 text-base mb-5">{products.length} productos disponibles</p>
+      <BackButton title={category.name} />
+      <p className="text-gray-500 text-base mb-5">
+        {products.length} productos disponibles
+      </p>
       <div className="space-y-4">
         {products.map((prod) => (
           <ProductCard key={prod.id} product={prod} />

@@ -2,8 +2,15 @@
 
 import Link from "next/link";
 import { useAppSelector, useAppDispatch } from "@/store/hooks";
-import { selectCartItems, selectCartTotal, updateQuantity, removeFromCart, clearCart } from "@/store/cartSlice";
+import {
+  selectCartItems,
+  selectCartTotal,
+  updateQuantity,
+  removeFromCart,
+  clearCart,
+} from "@/store/cartSlice";
 import { formatPrice } from "@/utils/format";
+import { BackButton } from "@/components/BackButton";
 
 export default function CartPage() {
   const items = useAppSelector(selectCartItems);
@@ -14,7 +21,10 @@ export default function CartPage() {
     return (
       <div className="text-center py-20">
         <p className="text-gray-500 text-lg mb-4">Tu pedido está vacío</p>
-        <Link href="/categories" className="text-primary-600 font-medium text-lg hover:underline">
+        <Link
+          href="/categories"
+          className="text-primary-600 font-medium text-lg hover:underline"
+        >
           Ver productos
         </Link>
       </div>
@@ -23,13 +33,18 @@ export default function CartPage() {
 
   return (
     <div>
-      <h2 className="text-2xl font-bold text-gray-900 mb-5">Mi Pedido</h2>
+      <BackButton title="Mi Pedido" />
 
       <div className="space-y-4 mb-6">
         {items.map((item) => (
-          <div key={item.productId} className="bg-white rounded-2xl border border-gray-100 p-5">
+          <div
+            key={item.productId}
+            className="bg-white rounded-2xl border border-gray-100 p-5"
+          >
             <div className="flex justify-between items-start mb-3">
-              <h3 className="font-medium text-gray-900 text-base flex-1 pr-3">{item.name}</h3>
+              <h3 className="font-medium text-gray-900 text-base flex-1 pr-3">
+                {item.name}
+              </h3>
               <button
                 onClick={() => dispatch(removeFromCart(item.productId))}
                 className="text-gray-400 hover:text-red-500 text-base"
@@ -41,23 +56,37 @@ export default function CartPage() {
               <div className="flex items-center border-2 border-gray-300 rounded-xl">
                 <button
                   onClick={() =>
-                    dispatch(updateQuantity({ productId: item.productId, quantity: item.quantity - 1 }))
+                    dispatch(
+                      updateQuantity({
+                        productId: item.productId,
+                        quantity: item.quantity - 1,
+                      }),
+                    )
                   }
                   className="px-4 py-2 text-gray-600 hover:bg-gray-50 text-base"
                 >
                   −
                 </button>
-                <span className="px-4 py-2 font-bold text-base min-w-[40px] text-center">{item.quantity}</span>
+                <span className="px-4 py-2 font-bold text-base min-w-[40px] text-center">
+                  {item.quantity}
+                </span>
                 <button
                   onClick={() =>
-                    dispatch(updateQuantity({ productId: item.productId, quantity: item.quantity + 1 }))
+                    dispatch(
+                      updateQuantity({
+                        productId: item.productId,
+                        quantity: item.quantity + 1,
+                      }),
+                    )
                   }
                   className="px-4 py-2 text-gray-600 hover:bg-gray-50 text-base"
                 >
                   +
                 </button>
               </div>
-              <span className="font-bold text-gray-900 text-lg">{formatPrice(item.price * item.quantity)}</span>
+              <span className="font-bold text-gray-900 text-lg">
+                {formatPrice(item.price * item.quantity)}
+              </span>
             </div>
           </div>
         ))}
@@ -66,7 +95,9 @@ export default function CartPage() {
       <div className="bg-white rounded-2xl border border-gray-100 p-5 mb-6">
         <div className="flex justify-between items-center">
           <span className="text-gray-600 text-lg">Total</span>
-          <span className="text-2xl font-bold text-gray-900">{formatPrice(total)}</span>
+          <span className="text-2xl font-bold text-gray-900">
+            {formatPrice(total)}
+          </span>
         </div>
       </div>
 

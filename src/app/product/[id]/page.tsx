@@ -6,6 +6,7 @@ import { getProductById, getCategoryById } from "@/data/products";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { addToCart, selectCartItems } from "@/store/cartSlice";
 import { formatPrice } from "@/utils/format";
+import { BackButton } from "@/components/BackButton";
 
 export default function ProductDetailPage() {
   const { id } = useParams();
@@ -38,6 +39,7 @@ export default function ProductDetailPage() {
 
   return (
     <div>
+      <BackButton title={product.name} />
       <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden mb-6">
         <div className="aspect-square bg-gray-50 flex items-center justify-center">
           <img
@@ -49,24 +51,14 @@ export default function ProductDetailPage() {
       </div>
 
       <div className="space-y-5">
-        <div>
-          <p className="text-sm text-gray-400 uppercase tracking-wide mb-1">
-            {category?.name}
-          </p>
-          <h2 className="text-2xl font-bold text-gray-900">{product.name}</h2>
-          <p className="text-2xl font-bold text-primary-600 mt-2">
-            {formatPrice(product.price)}
-          </p>
-        </div>
+        <p className="text-sm text-gray-400 uppercase tracking-wide">{category?.name}</p>
+        <p className="text-2xl font-bold text-primary-600">{formatPrice(product.price)}</p>
 
-        <p className="text-gray-600 text-base leading-relaxed">
-          {product.description}
-        </p>
+        <p className="text-gray-600 text-base leading-relaxed">{product.description}</p>
 
         {cartItem && (
           <p className="text-base text-gray-500">
-            Ya tenés {cartItem.quantity} en tu pedido (
-            {formatPrice(cartItem.price * cartItem.quantity)})
+            Ya tenés {cartItem.quantity} en tu pedido ({formatPrice(cartItem.price * cartItem.quantity)})
           </p>
         )}
 
@@ -78,9 +70,7 @@ export default function ProductDetailPage() {
             >
               −
             </button>
-            <span className="px-6 py-3 font-bold text-gray-900 text-lg min-w-[56px] text-center">
-              {quantity}
-            </span>
+            <span className="px-6 py-3 font-bold text-gray-900 text-lg min-w-[56px] text-center">{quantity}</span>
             <button
               onClick={() => setQuantity(quantity + 1)}
               className="px-5 py-3 text-gray-600 hover:bg-gray-50 text-lg"
@@ -88,9 +78,7 @@ export default function ProductDetailPage() {
               +
             </button>
           </div>
-          <span className="text-gray-500 text-base">
-            = {formatPrice(product.price * quantity)}
-          </span>
+          <span className="text-gray-500 text-base">= {formatPrice(product.price * quantity)}</span>
         </div>
 
         <button
