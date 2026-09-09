@@ -51,14 +51,21 @@ export default function ProductDetailPage() {
       </div>
 
       <div className="space-y-5">
-        <p className="text-sm text-gray-400 uppercase tracking-wide">{category?.name}</p>
-        <p className="text-2xl font-bold text-primary-600">{formatPrice(product.price)}</p>
+        <p className="text-sm text-gray-400 uppercase tracking-wide">
+          {category?.name}
+        </p>
+        <p className="text-2xl font-bold text-primary-600">
+          {formatPrice(product.price)}
+        </p>
 
-        <p className="text-gray-600 text-base leading-relaxed">{product.description}</p>
+        <p className="text-gray-600 text-base leading-relaxed">
+          {product.description}
+        </p>
 
         {cartItem && (
           <p className="text-base text-gray-500">
-            Ya tenés {cartItem.quantity} en tu pedido ({formatPrice(cartItem.price * cartItem.quantity)})
+            Ya tenés {cartItem.quantity} en tu pedido (
+            {formatPrice(cartItem.price * cartItem.quantity)})
           </p>
         )}
 
@@ -70,7 +77,9 @@ export default function ProductDetailPage() {
             >
               −
             </button>
-            <span className="px-6 py-3 font-bold text-gray-900 text-lg min-w-[56px] text-center">{quantity}</span>
+            <span className="px-6 py-3 font-bold text-gray-900 text-lg min-w-[56px] text-center">
+              {quantity}
+            </span>
             <button
               onClick={() => setQuantity(quantity + 1)}
               className="px-5 py-3 text-gray-600 hover:bg-gray-50 text-lg"
@@ -78,14 +87,17 @@ export default function ProductDetailPage() {
               +
             </button>
           </div>
-          <span className="text-gray-500 text-base">= {formatPrice(product.price * quantity)}</span>
+          <span className="text-gray-500 text-base"></span>
         </div>
 
         <button
           onClick={handleAdd}
-          className="w-full bg-primary-600 text-white py-4 rounded-2xl text-lg font-semibold hover:bg-primary-700 transition-colors"
+          className="flex items-center justify-between px-4 w-full bg-primary-600 text-white py-4 rounded-2xl text-lg font-semibold hover:bg-primary-700 transition-colors"
         >
-          Agregar al carrito — {formatPrice(product.price * quantity)}
+          <span className="text-lg font-semibold">Agregar al carrito</span>
+          <span className="text-lg font-bold">
+            {formatPrice(product.price * quantity)}
+          </span>
         </button>
 
         {cartTotal > 0 && (
@@ -93,7 +105,7 @@ export default function ProductDetailPage() {
             onClick={() => router.push("/cart")}
             className="w-full bg-gray-100 text-gray-700 py-4 rounded-2xl text-lg font-medium hover:bg-gray-200 transition-colors"
           >
-            Ver mi pedido — {formatPrice(cartTotal)}
+            Ver mi pedido
           </button>
         )}
       </div>

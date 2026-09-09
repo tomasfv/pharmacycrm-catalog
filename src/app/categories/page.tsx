@@ -2,6 +2,7 @@
 
 import { categories } from "@/data/products";
 import { CategoryCard } from "@/components/CategoryCard";
+import { CartFooter } from "@/components/CartFooter";
 
 export default function CategoriesPage() {
   return (
@@ -15,6 +16,7 @@ export default function CategoriesPage() {
           <CategoryCard key={cat.id} category={cat} />
         ))}
       </div>
+      <CartFooter />
     </div>
   );
 }
