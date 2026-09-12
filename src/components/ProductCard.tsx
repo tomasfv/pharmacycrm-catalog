@@ -10,7 +10,7 @@ export function ProductCard({ product }: { product: Product }) {
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-lg transition-shadow flex w-full">
         <div className="w-36 h-36 bg-gray-50 flex items-center justify-center shrink-0">
           <img
-            src={product.image}
+            src={product.imageUrl || product.image || "/perfume.webp"}
             alt={product.name}
             className="w-20 h-20 object-contain opacity-50"
           />

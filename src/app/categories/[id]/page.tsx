@@ -1,31 +1,38 @@
 "use client";
 
+import { useEffect } from "react";
 import { useParams } from "next/navigation";
-import { getCategoryById, getProductsByCategory } from "@/data/products";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { fetchProducts } from "@/store/catalogProductsSlice";
 import { ProductCard } from "@/components/ProductCard";
 import { CartFooter } from "@/components/CartFooter";
 import { BackButton } from "@/components/BackButton";
 
 export default function CategoryPage() {
   const { id } = useParams();
-  const category = getCategoryById(id as string);
-  const products = getProductsByCategory(id as string);
+  const dispatch = useAppDispatch();
+  const { products, loading } = useAppSelector((state) => state.catalogProducts);
+  const { categories } = useAppSelector((state) => state.catalogCategories);
 
-  if (!category) {
-    return <p className="text-gray-500 text-lg">Categoría no encontrada.</p>;
-  }
+  const category = categories.find((c) => c.id === id);
+
+  useEffect(() => {
+    dispatch(fetchProducts(id as string));
+  }, [dispatch, id]);
 
   return (
     <div>
-      <BackButton title={category.name} />
+      <BackButton title={category?.name || "Categoría"} />
       <p className="text-gray-500 text-base mb-5">
-        {products.length} productos disponibles
+        {loading ? "Cargando productos..." : `${products.length} productos disponibles`}
       </p>
-      <div className="space-y-4">
-        {products.map((prod) => (
-          <ProductCard key={prod.id} product={prod} />
-        ))}
-      </div>
+      {!loading && (
+        <div className="space-y-4">
+          {products.map((prod) => (
+            <ProductCard key={prod.id} product={prod} />
+          ))}
+        </div>
+      )}
       <CartFooter />
     </div>
   );

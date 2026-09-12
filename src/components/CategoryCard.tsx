@@ -8,7 +8,7 @@ export function CategoryCard({ category }: { category: Category }) {
     <Link href={`/categories/${category.id}`} className="block">
       <div className="relative aspect-[21/9] rounded-2xl overflow-hidden hover:shadow-lg transition-shadow">
         <img
-          src={category.image}
+          src={category.image || "/perfume.webp"}
           alt={category.name}
           className="absolute inset-0 w-full h-full object-cover"
         />

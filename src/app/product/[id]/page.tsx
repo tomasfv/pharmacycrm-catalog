@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { getProductById, getCategoryById } from "@/data/products";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { fetchProduct, clearCurrentProduct } from "@/store/catalogProductsSlice";
 import { addToCart, selectCartItems } from "@/store/cartSlice";
 import { formatPrice } from "@/utils/format";
 import { BackButton } from "@/components/BackButton";
@@ -13,15 +13,28 @@ export default function ProductDetailPage() {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const cartItems = useAppSelector(selectCartItems);
-
-  const product = getProductById(id as string);
+  const { currentProduct: product, loading } = useAppSelector((state) => state.catalogProducts);
+  const { categories } = useAppSelector((state) => state.catalogCategories);
   const [quantity, setQuantity] = useState(1);
+
+  useEffect(() => {
+    if (id) {
+      dispatch(fetchProduct(id as string));
+    }
+    return () => {
+      dispatch(clearCurrentProduct());
+    };
+  }, [dispatch, id]);
+
+  if (loading) {
+    return <p className="text-gray-400 text-lg">Cargando producto...</p>;
+  }
 
   if (!product) {
     return <p className="text-gray-500 text-lg">Producto no encontrado.</p>;
   }
 
-  const category = getCategoryById(product.categoryId);
+  const category = categories.find((c) => c.id === product.categoryId);
   const cartItem = cartItems.find((i) => i.productId === product.id);
   const cartTotal = cartItems.reduce((sum, i) => sum + i.price * i.quantity, 0);
 
@@ -43,7 +56,7 @@ export default function ProductDetailPage() {
       <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden mb-6">
         <div className="aspect-square bg-gray-50 flex items-center justify-center">
           <img
-            src={product.image}
+            src={product.imageUrl || "/perfume.webp"}
             alt={product.name}
             className="w-48 h-48 object-contain opacity-50"
           />

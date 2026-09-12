@@ -1,11 +1,13 @@
 "use client";
 
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useAppSelector, useAppDispatch } from "@/store/hooks";
 import { selectCartItems, selectCartTotal, clearCart } from "@/store/cartSlice";
+import { catalogApi } from "@/api/catalog";
 import { formatPrice } from "@/utils/format";
 import type { OrderForm } from "@/types";
 import { BackButton } from "@/components/BackButton";
@@ -22,6 +24,7 @@ export default function CheckoutPage() {
   const dispatch = useAppDispatch();
   const items = useAppSelector(selectCartItems);
   const total = useAppSelector(selectCartTotal);
+  const [submitting, setSubmitting] = useState(false);
 
   const {
     register,
@@ -51,37 +54,53 @@ export default function CheckoutPage() {
     );
   }
 
-  const onSubmit = (data: OrderForm) => {
-    const itemsList = items
-      .map(
-        (i) =>
-          `• ${i.name} x${i.quantity} — ${formatPrice(i.price * i.quantity)}`,
-      )
-      .join("\n");
+  const onSubmit = async (data: OrderForm) => {
+    if (submitting) return;
+    setSubmitting(true);
 
-    const deliveryLabel =
-      data.deliveryMethod === "pickup"
-        ? "Retiro en local"
-        : "Envío a domicilio";
-    const paymentLabel = data.paymentMethod === "cash" ? "Efectivo" : "Tarjeta";
+    try {
+      await catalogApi.createOrder({
+        customerName: data.fullName,
+        customerPhone: data.phone,
+        deliveryMethod: data.deliveryMethod,
+        paymentMethod: data.paymentMethod,
+        items: items.map((i) => ({
+          productId: i.productId,
+          name: i.name,
+          quantity: i.quantity,
+          price: i.price,
+        })),
+      });
 
-    const message = [
-      `Hola, quiero hacer un pedido:`,
-      ``,
-      itemsList,
-      ``,
-      `Total: ${formatPrice(total)}`,
-      ``,
-      `Nombre: ${data.fullName}`,
-      `Teléfono: ${data.phone}`,
-      `Entrega: ${deliveryLabel}`,
-      `Pago: ${paymentLabel}`,
-    ].join("\n");
+      const itemsList = items
+        .map((i) => `• ${i.name} x${i.quantity} — ${formatPrice(i.price * i.quantity)}`)
+        .join("\n");
+      const deliveryLabel = data.deliveryMethod === "pickup" ? "Retiro en local" : "Envío a domicilio";
+      const paymentLabel = data.paymentMethod === "cash" ? "Efectivo" : "Tarjeta";
 
-    const encoded = encodeURIComponent(message);
-    window.open(`https://wa.me/5493517619943?text=${encoded}`, "_blank");
-    dispatch(clearCart());
-    router.push("/categories");
+      const message = [
+        `Hola, quiero hacer un pedido:`,
+        ``,
+        itemsList,
+        ``,
+        `Total: ${formatPrice(total)}`,
+        ``,
+        `Nombre: ${data.fullName}`,
+        `Teléfono: ${data.phone}`,
+        `Entrega: ${deliveryLabel}`,
+        `Pago: ${paymentLabel}`,
+      ].join("\n");
+
+      const encoded = encodeURIComponent(message);
+      window.open(`https://wa.me/5493517619943?text=${encoded}`, "_blank");
+
+      dispatch(clearCart());
+      router.push("/categories");
+    } catch {
+      alert("Error al enviar el pedido. Intentá de nuevo.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -156,9 +175,10 @@ export default function CheckoutPage() {
 
         <button
           type="submit"
-          className="w-full bg-primary-600 text-white py-4 rounded-2xl text-lg font-semibold hover:bg-primary-700 transition-colors"
+          disabled={submitting}
+          className="w-full bg-primary-600 text-white py-4 rounded-2xl text-lg font-semibold hover:bg-primary-700 transition-colors disabled:opacity-50"
         >
-          Pedir por WhatsApp
+          {submitting ? "Enviando pedido..." : "Confirmar pedido"}
         </button>
       </form>
     </div>

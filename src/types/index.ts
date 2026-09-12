@@ -1,16 +1,17 @@
 export interface Category {
   id: string;
   name: string;
-  image: string;
+  image?: string;
 }
 
 export interface Product {
   id: string;
   categoryId: string;
   name: string;
-  description: string;
+  description?: string;
   price: number;
-  image: string;
+  imageUrl?: string;
+  image?: string;
 }
 
 export interface CartItem {
