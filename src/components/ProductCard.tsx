@@ -12,7 +12,7 @@ export function ProductCard({ product }: { product: Product }) {
           <img
             src={product.imageUrl || product.image || "/perfume.webp"}
             alt={product.name}
-            className="w-20 h-20 object-contain opacity-50"
+            className="w-20 h-20 object-contain"
           />
         </div>
         <div className="flex-1 p-5 flex flex-col justify-between min-w-0">

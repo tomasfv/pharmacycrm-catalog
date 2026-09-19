@@ -58,7 +58,7 @@ export default function ProductDetailPage() {
           <img
             src={product.imageUrl || "/perfume.webp"}
             alt={product.name}
-            className="w-48 h-48 object-contain opacity-50"
+            className="w-48 h-48 object-contain"
           />
         </div>
       </div>
