@@ -3,7 +3,10 @@
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { fetchProduct, clearCurrentProduct } from "@/store/catalogProductsSlice";
+import {
+  fetchProduct,
+  clearCurrentProduct,
+} from "@/store/catalogProductsSlice";
 import { addToCart, selectCartItems } from "@/store/cartSlice";
 import { formatPrice } from "@/utils/format";
 import { BackButton } from "@/components/BackButton";
@@ -13,7 +16,9 @@ export default function ProductDetailPage() {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const cartItems = useAppSelector(selectCartItems);
-  const { currentProduct: product, loading } = useAppSelector((state) => state.catalogProducts);
+  const { currentProduct: product, loading } = useAppSelector(
+    (state) => state.catalogProducts,
+  );
   const { categories } = useAppSelector((state) => state.catalogCategories);
   const [quantity, setQuantity] = useState(1);
 
@@ -53,12 +58,12 @@ export default function ProductDetailPage() {
   return (
     <div>
       <BackButton title={product.name} />
-      <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden mb-6">
-        <div className="aspect-square bg-gray-50 flex items-center justify-center">
+      <div className="bg-white rounded-2xl overflow-hidden mb-6">
+        <div className="max-h-56 bg-gray-50 flex items-center justify-center">
           <img
-            src={product.imageUrl || "/perfume.webp"}
+            src={product.imageUrl || "/logoFarmaciaSmallV.jpeg"}
             alt={product.name}
-            className="w-48 h-48 object-contain"
+            className="max-h-52 object-contain rounded-2xl"
           />
         </div>
       </div>
