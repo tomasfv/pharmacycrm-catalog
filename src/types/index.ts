@@ -4,6 +4,15 @@ export interface Category {
   image?: string;
 }
 
+export interface ProductVariation {
+  id: string;
+  productId?: string;
+  label: string;
+  price: number;
+  inStock: boolean;
+  sortOrder?: number;
+}
+
 export interface Product {
   id: string;
   categoryId: string;
@@ -12,10 +21,12 @@ export interface Product {
   price: number;
   imageUrl?: string;
   image?: string;
+  variations?: ProductVariation[];
 }
 
 export interface CartItem {
   productId: string;
+  variationId?: string;
   name: string;
   price: number;
   quantity: number;

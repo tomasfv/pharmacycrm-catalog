@@ -21,6 +21,9 @@ export default function ProductDetailPage() {
   );
   const { categories } = useAppSelector((state) => state.catalogCategories);
   const [quantity, setQuantity] = useState(1);
+  const [selectedVariationId, setSelectedVariationId] = useState<
+    string | null
+  >(null);
 
   useEffect(() => {
     if (id) {
@@ -31,6 +34,24 @@ export default function ProductDetailPage() {
     };
   }, [dispatch, id]);
 
+  useEffect(() => {
+    if (!product) {
+      setSelectedVariationId(null);
+      return;
+    }
+    const variations = product.variations ?? [];
+    if (variations.length === 0) {
+      setSelectedVariationId(null);
+      return;
+    }
+    const stillValid = variations.some((v) => v.id === selectedVariationId);
+    if (!stillValid) {
+      const first =
+        variations.find((v) => v.inStock) ?? variations[0];
+      setSelectedVariationId(first.id);
+    }
+  }, [product, selectedVariationId]);
+
   if (loading) {
     return <p className="text-gray-400 text-lg">Cargando producto...</p>;
   }
@@ -40,15 +61,26 @@ export default function ProductDetailPage() {
   }
 
   const category = categories.find((c) => c.id === product.categoryId);
-  const cartItem = cartItems.find((i) => i.productId === product.id);
+  const variations = product.variations ?? [];
+  const selectedVariation =
+    variations.find((v) => v.id === selectedVariationId) ?? null;
+  const displayPrice = selectedVariation ? selectedVariation.price : product.price;
+  const canAdd =
+    variations.length === 0 || (!!selectedVariation && selectedVariation.inStock);
+  const cartItem = cartItems.find(
+    (i) => i.productId === product.id && i.variationId === selectedVariation?.id,
+  );
   const cartTotal = cartItems.reduce((sum, i) => sum + i.price * i.quantity, 0);
 
   const handleAdd = () => {
+    if (!canAdd) return;
     dispatch(
       addToCart({
         productId: product.id,
+        variationId: selectedVariation?.id,
+        variationLabel: selectedVariation?.label,
         name: product.name,
-        price: product.price,
+        price: displayPrice,
         quantity,
       }),
     );
@@ -73,12 +105,49 @@ export default function ProductDetailPage() {
           {category?.name}
         </p>
         <p className="text-2xl font-bold text-primary-600">
-          {formatPrice(product.price)}
+          {formatPrice(displayPrice)}
         </p>
 
         <p className="text-gray-600 text-base leading-relaxed">
           {product.description}
         </p>
+
+        {variations.length > 0 && (
+          <div className="space-y-2">
+            <p className="text-sm font-medium text-gray-700">
+              Elegí una opción
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {variations.map((v) => {
+                const selected = v.id === selectedVariationId;
+                return (
+                  <button
+                    key={v.id}
+                    onClick={() => setSelectedVariationId(v.id)}
+                    disabled={!v.inStock}
+                    className={`flex flex-col items-start gap-0.5 px-4 py-2.5 rounded-xl border-2 transition-colors ${
+                      !v.inStock
+                        ? "border-gray-200 opacity-50 cursor-not-allowed"
+                        : selected
+                          ? "border-primary-600 bg-primary-50"
+                          : "border-gray-200 hover:border-gray-300"
+                    }`}
+                  >
+                    <span className="text-sm font-semibold text-gray-900">
+                      {v.label}
+                    </span>
+                    <span className="text-sm font-bold text-primary-600">
+                      {formatPrice(v.price)}
+                    </span>
+                    {!v.inStock && (
+                      <span className="text-xs text-gray-400">Sin stock</span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         {cartItem && (
           <p className="text-base text-gray-500">
@@ -110,11 +179,18 @@ export default function ProductDetailPage() {
 
         <button
           onClick={handleAdd}
-          className="flex items-center justify-between px-4 w-full bg-primary-600 text-white py-4 rounded-2xl text-lg font-semibold hover:bg-primary-700 transition-colors"
+          disabled={!canAdd}
+          className={`flex items-center justify-between px-4 w-full py-4 rounded-2xl text-lg font-semibold transition-colors ${
+            canAdd
+              ? "bg-primary-600 text-white hover:bg-primary-700"
+              : "bg-gray-300 text-gray-500 cursor-not-allowed"
+          }`}
         >
-          <span className="text-lg font-semibold">Agregar al carrito</span>
+          <span className="text-lg font-semibold">
+            {canAdd ? "Agregar al carrito" : "Sin disponibilidad"}
+          </span>
           <span className="text-lg font-bold">
-            {formatPrice(product.price * quantity)}
+            {formatPrice(displayPrice * quantity)}
           </span>
         </button>
 

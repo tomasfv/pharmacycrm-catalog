@@ -38,7 +38,7 @@ export default function CartPage() {
       <div className="space-y-4 mb-6">
         {items.map((item) => (
           <div
-            key={item.productId}
+            key={`${item.productId}:${item.variationId ?? ""}`}
             className="bg-white rounded-2xl border border-gray-100 p-5"
           >
             <div className="flex justify-between items-start mb-3">
@@ -46,7 +46,14 @@ export default function CartPage() {
                 {item.name}
               </h3>
               <button
-                onClick={() => dispatch(removeFromCart(item.productId))}
+                onClick={() =>
+                  dispatch(
+                    removeFromCart({
+                      productId: item.productId,
+                      variationId: item.variationId,
+                    }),
+                  )
+                }
                 className="text-gray-400 hover:text-red-500 text-base"
               >
                 ✕
@@ -59,6 +66,7 @@ export default function CartPage() {
                     dispatch(
                       updateQuantity({
                         productId: item.productId,
+                        variationId: item.variationId,
                         quantity: item.quantity - 1,
                       }),
                     )
@@ -75,6 +83,7 @@ export default function CartPage() {
                     dispatch(
                       updateQuantity({
                         productId: item.productId,
+                        variationId: item.variationId,
                         quantity: item.quantity + 1,
                       }),
                     )

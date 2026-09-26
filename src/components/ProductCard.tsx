@@ -5,6 +5,12 @@ import { Product } from "@/types";
 import { formatPrice } from "@/utils/format";
 
 export function ProductCard({ product }: { product: Product }) {
+  const variations = product.variations ?? [];
+  const hasVariations = variations.length > 0;
+  const minVariationPrice = hasVariations
+    ? Math.min(...variations.map((v) => v.price))
+    : null;
+
   return (
     <Link href={`/product/${product.id}`} className="block">
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-lg transition-shadow flex w-full">
@@ -22,7 +28,9 @@ export function ProductCard({ product }: { product: Product }) {
             {product.name}
           </h3>
           <p className="text-primary-600 font-bold text-lg">
-            {formatPrice(product.price)}
+            {hasVariations
+              ? `Desde ${formatPrice(minVariationPrice!)}`
+              : formatPrice(product.price)}
           </p>
         </div>
       </div>

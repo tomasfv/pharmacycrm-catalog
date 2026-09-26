@@ -10,6 +10,15 @@ export interface ApiCategory {
   image?: string;
 }
 
+export interface ApiProductVariation {
+  id: string;
+  productId?: string;
+  label: string;
+  price: number;
+  inStock: boolean;
+  sortOrder?: number;
+}
+
 export interface ApiProduct {
   id: string;
   name: string;
@@ -19,10 +28,12 @@ export interface ApiProduct {
   description?: string;
   inStock: boolean;
   category?: ApiCategory;
+  variations?: ApiProductVariation[];
 }
 
 export interface ApiOrderItem {
   productId: string;
+  variationId?: string;
   name: string;
   quantity: number;
   price: number;

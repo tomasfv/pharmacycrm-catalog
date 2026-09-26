@@ -20,6 +20,12 @@ function saveCart(items: CartItem[]) {
   localStorage.setItem("catalog-cart", JSON.stringify(items));
 }
 
+const sameLine = (
+  item: CartItem,
+  productId: string,
+  variationId?: string,
+) => item.productId === productId && item.variationId === variationId;
+
 const initialState: CartState = {
   items: [],
 };
@@ -33,30 +39,48 @@ const cartSlice = createSlice({
     },
     addToCart(
       state,
-      action: PayloadAction<{ productId: string; name: string; price: number; quantity: number }>
+      action: PayloadAction<{
+        productId: string;
+        variationId?: string;
+        variationLabel?: string;
+        name: string;
+        price: number;
+        quantity: number;
+      }>
     ) {
-      const { productId, name, price, quantity } = action.payload;
-      const existing = state.items.find((i) => i.productId === productId);
+      const { productId, variationId, variationLabel, name, price, quantity } =
+        action.payload;
+      const displayName = variationLabel
+        ? `${name} (${variationLabel})`
+        : name;
+      const existing = state.items.find((i) =>
+        sameLine(i, productId, variationId),
+      );
       if (existing) {
         existing.quantity += quantity;
       } else {
-        state.items.push({ productId, name, price, quantity });
+        state.items.push({ productId, variationId, name: displayName, price, quantity });
       }
       saveCart(state.items);
     },
-    removeFromCart(state, action: PayloadAction<string>) {
-      state.items = state.items.filter((i) => i.productId !== action.payload);
+    removeFromCart(
+      state,
+      action: PayloadAction<{ productId: string; variationId?: string }>
+    ) {
+      const { productId, variationId } = action.payload;
+      state.items = state.items.filter((i) => !sameLine(i, productId, variationId));
       saveCart(state.items);
     },
     updateQuantity(
       state,
-      action: PayloadAction<{ productId: string; quantity: number }>
+      action: PayloadAction<{ productId: string; variationId?: string; quantity: number }>
     ) {
-      const item = state.items.find((i) => i.productId === action.payload.productId);
+      const { productId, variationId, quantity } = action.payload;
+      const item = state.items.find((i) => sameLine(i, productId, variationId));
       if (item) {
-        item.quantity = action.payload.quantity;
+        item.quantity = quantity;
         if (item.quantity <= 0) {
-          state.items = state.items.filter((i) => i.productId !== action.payload.productId);
+          state.items = state.items.filter((i) => !sameLine(i, productId, variationId));
         }
       }
       saveCart(state.items);
