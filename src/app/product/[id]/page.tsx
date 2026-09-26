@@ -10,6 +10,10 @@ import {
 import { addToCart, selectCartItems } from "@/store/cartSlice";
 import { formatPrice } from "@/utils/format";
 import { BackButton } from "@/components/BackButton";
+import { ProductVariation } from "@/types";
+
+const sortByPrice = (variations: ProductVariation[]): ProductVariation[] =>
+  [...variations].sort((a, b) => Number(a.price) - Number(b.price));
 
 export default function ProductDetailPage() {
   const { id } = useParams();
@@ -39,7 +43,7 @@ export default function ProductDetailPage() {
       setSelectedVariationId(null);
       return;
     }
-    const variations = product.variations ?? [];
+    const variations = sortByPrice(product.variations ?? []);
     if (variations.length === 0) {
       setSelectedVariationId(null);
       return;
@@ -61,7 +65,7 @@ export default function ProductDetailPage() {
   }
 
   const category = categories.find((c) => c.id === product.categoryId);
-  const variations = product.variations ?? [];
+  const variations = sortByPrice(product.variations ?? []);
   const selectedVariation =
     variations.find((v) => v.id === selectedVariationId) ?? null;
   const displayPrice = selectedVariation ? selectedVariation.price : product.price;
