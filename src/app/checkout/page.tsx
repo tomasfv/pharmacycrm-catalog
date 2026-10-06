@@ -11,6 +11,13 @@ import { catalogApi } from "@/api/catalog";
 import { formatPrice } from "@/utils/format";
 import type { OrderForm } from "@/types";
 import { BackButton } from "@/components/BackButton";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faStore,
+  faTruck,
+  faMoneyBillWave,
+  faCreditCard,
+} from "@fortawesome/free-solid-svg-icons";
 
 const schema = yup.object({
   fullName: yup.string().required("El nombre es obligatorio"),
@@ -18,6 +25,66 @@ const schema = yup.object({
   deliveryMethod: yup.string().oneOf(["pickup", "delivery"]).required(),
   paymentMethod: yup.string().oneOf(["cash", "card"]).required(),
 });
+
+interface Option {
+  value: string;
+  label: string;
+  icon: typeof faStore;
+}
+
+const DELIVERY_OPTIONS: Option[] = [
+  { value: "pickup", label: "Retiro en el local", icon: faStore },
+  { value: "delivery", label: "Envío a domicilio", icon: faTruck },
+];
+
+const PAYMENT_OPTIONS: Option[] = [
+  { value: "cash", label: "Efectivo", icon: faMoneyBillWave },
+  { value: "card", label: "Tarjeta", icon: faCreditCard },
+];
+
+function OptionCards({
+  label,
+  options,
+  value,
+  onChange,
+}: {
+  label: string;
+  options: Option[];
+  value: string;
+  onChange: (value: string) => void;
+}) {
+  return (
+    <div>
+      <p className="block text-base font-medium text-gray-700 mb-2">{label}</p>
+      <div className="grid grid-cols-2 gap-3">
+        {options.map((opt) => {
+          const selected = opt.value === value;
+          return (
+            <button
+              key={opt.value}
+              type="button"
+              onClick={() => onChange(opt.value)}
+              aria-pressed={selected}
+              className={`flex flex-col items-start gap-2 px-4 py-3.5 rounded-xl border-2 transition-colors text-left ${
+                selected
+                  ? "border-primary-600 bg-primary-50"
+                  : "border-gray-200 hover:border-gray-300"
+              }`}
+            >
+              <FontAwesomeIcon
+                icon={opt.icon}
+                className={`w-6 h-6 ${selected ? "text-primary-600" : "text-gray-400"}`}
+              />
+              <span className="text-sm font-semibold text-gray-900">
+                {opt.label}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -29,6 +96,8 @@ export default function CheckoutPage() {
   const {
     register,
     handleSubmit,
+    watch,
+    setValue,
     formState: { errors },
   } = useForm<OrderForm>({
     resolver: yupResolver(schema),
@@ -37,6 +106,9 @@ export default function CheckoutPage() {
       paymentMethod: "cash",
     },
   });
+
+  const deliveryMethod = watch("deliveryMethod");
+  const paymentMethod = watch("paymentMethod");
 
   if (items.length === 0) {
     return (
@@ -139,31 +211,23 @@ export default function CheckoutPage() {
           )}
         </div>
 
-        <div>
-          <label className="block text-base font-medium text-gray-700 mb-2">
-            Forma de entrega
-          </label>
-          <select
-            {...register("deliveryMethod")}
-            className="w-full rounded-xl border-2 border-gray-300 px-4 py-3 text-base bg-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-          >
-            <option value="pickup">Retiro en local</option>
-            <option value="delivery">Envío a domicilio</option>
-          </select>
-        </div>
+        <OptionCards
+          label="Forma de entrega"
+          options={DELIVERY_OPTIONS}
+          value={deliveryMethod}
+          onChange={(v) =>
+            setValue("deliveryMethod", v as OrderForm["deliveryMethod"])
+          }
+        />
 
-        <div>
-          <label className="block text-base font-medium text-gray-700 mb-2">
-            Forma de pago
-          </label>
-          <select
-            {...register("paymentMethod")}
-            className="w-full rounded-xl border-2 border-gray-300 px-4 py-3 text-base bg-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-          >
-            <option value="cash">Efectivo</option>
-            <option value="card">Tarjeta</option>
-          </select>
-        </div>
+        <OptionCards
+          label="Forma de pago"
+          options={PAYMENT_OPTIONS}
+          value={paymentMethod}
+          onChange={(v) =>
+            setValue("paymentMethod", v as OrderForm["paymentMethod"])
+          }
+        />
 
         <div className="bg-white rounded-2xl border border-gray-100 p-5">
           <div className="flex justify-between items-center">
