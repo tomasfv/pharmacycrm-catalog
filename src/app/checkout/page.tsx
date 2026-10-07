@@ -9,6 +9,7 @@ import { useAppSelector, useAppDispatch } from "@/store/hooks";
 import { selectCartItems, selectCartTotal, clearCart } from "@/store/cartSlice";
 import { catalogApi } from "@/api/catalog";
 import { formatPrice } from "@/utils/format";
+import { buildOrderWhatsAppMessage } from "@/utils/orderMessage";
 import type { OrderForm } from "@/types";
 import { BackButton } from "@/components/BackButton";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -131,7 +132,7 @@ export default function CheckoutPage() {
     setSubmitting(true);
 
     try {
-      await catalogApi.createOrder({
+      const { data: created } = await catalogApi.createOrder({
         customerName: data.fullName,
         customerPhone: data.phone,
         deliveryMethod: data.deliveryMethod,
@@ -145,24 +146,20 @@ export default function CheckoutPage() {
         })),
       });
 
-      const itemsList = items
-        .map((i) => `• ${i.name} x${i.quantity} — ${formatPrice(i.price * i.quantity)}`)
-        .join("\n");
-      const deliveryLabel = data.deliveryMethod === "pickup" ? "Retiro en local" : "Envío a domicilio";
+      const deliveryLabel =
+        data.deliveryMethod === "pickup" ? "Retiro en el local" : "Envío a domicilio";
       const paymentLabel = data.paymentMethod === "cash" ? "Efectivo" : "Tarjeta";
 
-      const message = [
-        `Hola, quiero hacer un pedido:`,
-        ``,
-        itemsList,
-        ``,
-        `Total: ${formatPrice(total)}`,
-        ``,
-        `Nombre: ${data.fullName}`,
-        `Teléfono: ${data.phone}`,
-        `Entrega: ${deliveryLabel}`,
-        `Pago: ${paymentLabel}`,
-      ].join("\n");
+      const message = buildOrderWhatsAppMessage({
+        orderId: created.data.id,
+        createdAt: created.data.createdAt,
+        customerName: data.fullName,
+        customerPhone: data.phone,
+        deliveryLabel,
+        paymentLabel,
+        items,
+        total,
+      });
 
       const encoded = encodeURIComponent(message);
       window.open(`https://wa.me/5493517619943?text=${encoded}`, "_blank");
